@@ -1,7 +1,10 @@
 package com.au;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class App2 {
 
@@ -9,6 +12,14 @@ public class App2 {
 		ProducerConsumer pc = new ProducerConsumer();
 
 		Thread producer = new Thread(() -> {
+			try {
+				pc.produce();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+
+		Thread producer2 = new Thread(() -> {
 			try {
 				pc.produce();
 			} catch (InterruptedException e) {
@@ -24,7 +35,7 @@ public class App2 {
 			}
 		});
 
-		producer.start();consumer.start();
+		producer.start();producer2.start();consumer.start();
 	}
 
 }
@@ -32,35 +43,24 @@ public class App2 {
 class ProducerConsumer {
 
 	private final Object lock = new Object();
-	LinkedList<Integer> buffer = new LinkedList<Integer>();
-	private final int SIZE = 10;
+	BlockingQueue<Integer> buffer = new LinkedBlockingDeque<>(10);
 
 	void produce() throws InterruptedException {
 		int value = 0;
 
 		while(true) {
-			synchronized (lock) {
-
-				if(buffer.size() == SIZE) {
-					lock.wait();
-				}
-				buffer.add(value++);
-				lock.notify();
-			}
+			buffer.put(value++);
 		}
 	}
 
 	void consume() throws InterruptedException {
 		while (true) {
-			synchronized (lock) {
-				if(buffer.isEmpty()) {
-					lock.wait();
-				}
-				int item = buffer.removeFirst();
-				System.out.print("Size of Buffer : " + buffer.size() + " ");
-				System.out.println("Took item " + item);
-				lock.notify();
-			}
+
+			Integer item = buffer.poll();
+
+			System.out.print("Size of Buffer : " + buffer.size() + " ");
+			System.out.println("Took item " + item);
+
 			Thread.sleep(new Random().nextInt(1000));
 		}
 	}
