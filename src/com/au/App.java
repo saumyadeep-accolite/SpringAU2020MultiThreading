@@ -2,20 +2,14 @@ package com.au;
 
 public class App {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 
-		Thread worker = new Thread(new Runnable() {
+		Thread worker = new Worker();
 
-			@Override
-			public void run() {
-				System.out.println("Inner Says Hi!");
-			}
-
-		});
 		worker.start();
 
-		Thread worker2 = new Thread(() -> System.out.println("Inner Says Hi!"));
-		worker2.start();
-		
+		worker.join();
+
+		System.out.println("Main finished");
 	}
 }
