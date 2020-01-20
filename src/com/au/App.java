@@ -2,24 +2,25 @@ package com.au;
 
 public class App {
 
+	static int count=0;
+
 	public static void main(String[] args) throws InterruptedException {
 
-		Thread a = new Worker("A");
-		Thread b = new Worker("B");
-		Thread c = new Worker("C");
+		Thread t1 = new Thread(() -> {
+			for (int i = 0; i < 10000; i++) {
+				count++;
+			}
+		});
+		Thread t2 = new Thread(() -> {
+			for (int i = 0; i < 10000; i++) {
+				count++;
+			}
+		});
 
-		a.setPriority(Thread.MIN_PRIORITY);
-		b.setPriority(Thread.NORM_PRIORITY);
-		c.setPriority(Thread.MAX_PRIORITY);
+		t1.start();t2.start();
 
+		t1.join();t2.join();
 
-
-		a.start();b.start();c.start();
-
-		a.join();b.join();c.join();
-
-
-
-		System.out.println(Thread.currentThread().getPriority());
+		System.out.println("Count : " + count);
 	}
 }
