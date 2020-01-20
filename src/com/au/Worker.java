@@ -13,6 +13,13 @@ public class Worker extends Thread {
 				e.printStackTrace();
 			}
 		}
+		Thread t = new Thread(new Worker2());
+		t.start();
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		System.out.println("Worker Finished");
 
 	}
